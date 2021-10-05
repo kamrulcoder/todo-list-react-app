@@ -1,70 +1,148 @@
-# Getting Started with Create React App
+## Simple TodoList project  in React 
+> ## The steps to project 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<details>
+<summary>1. একটা ফর্ম,  ইনপুট  নিতে হবে </summary>
 
-## Available Scripts
+```javascript
 
-In the project directory, you can run:
+<Form onSubmit={handleSubmit}>
+<Row>
+    <Col lg={10}>
+    <Form.Control value={todo} onChange={(e) => setTodo(e.target.value)} type="text" placeholder="Add Your  New  Todo" />
+    </Col>
+    <Col>
+    <Button size="block" variant="primary" type="submit"> {editId ? (<FontAwesomeIcon icon={faMarker} />) : (<FontAwesomeIcon icon={faPlus} />)}   </Button>
+    </Col>
+</Row>
+  </Form>
+```
+</details>
+<br/>
 
-### `yarn start`
+<details>
+<summary>2. লিস্ট গ্রুপ নিতে  হবে  </summary>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```javascript
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+    <ListGroup.Item key={singleTodos.id} className="d-flex justify-content-between align-items-center">
+        <p className="mb-0">{singleTodos.todo}</p>
+        <div>
+        <span onClick={() => handleEdit(singleTodos.id)}> <FontAwesomeIcon icon={faEdit} /></span>
+        <span onClick={() => handleDelete(singleTodos.id)}> <FontAwesomeIcon icon={faTrash} /></span>
+        </div>
+    </ListGroup.Item>
+```
+</details>
+<br>
+<details>
+<summary>3. UseState  তিনটা  নিতে  হবে  </summary>
 
-### `yarn test`
+```javascript
+  const [todo, setTodo] = useState("");
+  const [todos, setTodos] = useState([])
+  const [editId, setEditId] = useState(0)
+```
+</details>
+<br>
+<details>
+<summary>4. ফর্ম সাবমিট করার সময়  কাজ করার জন্য  ফাঙ্কশন নিতে  হবে</summary>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```javascript
+<Form onSubmit={handleSubmit}>
+```
 
-### `yarn build`
+```javascript
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  // submit Function  start 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(editId){
+    const editTodo = todos.find(tod => tod.id === editId);
+    const updateTodos = todos.map(t => t.id === editTodo.id
+      ? (t = { id: t.id, todo }) :
+      { id: t.id, todo: t.todo }
+    )
+      setTodos(updateTodos)
+      setEditId(0)
+      setTodo("")
+      return 
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    }
+    if (todo !== "") {
+      setTodos([{ id: `${todo}-${Date.now()}`, todo }, ...todos]);
+    }
+    setTodo("")
+  }
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+</details>
+<br>
+<details>
+<summary>5. ইনপুট  ভ্যালু চেঞ্জ  করার জন্য আরেকটা   ফাঙ্কশন  নিতে হবে </summary>
 
-### `yarn eject`
+```javascript
+<Form.Control value={todo} onChange={(e) => setTodo(e.target.value)} type="text" placeholder="Add Your  New  Todo" />
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+</details>
+<br>
+<details>
+<summary>6. সিঙ্গেল লিস্ট  কে ডিলিট করার জন্য  ফাঙ্কশন করতে হবে </summary>
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```HTML
+ <span onClick={() => handleDelete(singleTodos.id)}> <FontAwesomeIcon icon={faTrash} /></span>
+```
+```javascript
+  // handleDelete fucntion start 
+  const handleDelete = id => {
+    const newTodos = todos.filter(list => list.id !== id);
+    setTodos([...newTodos])
+  }
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
+</details>
+<br>
+<details>
+<summary>7. সিঙ্গেল লিস্ট  কে এডিট  করার জন্য  ফাঙ্কশন করতে হবে </summary>
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```javascript
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  // edit tos function start 
+  const handleEdit = (id) => {
+    const editValue = todos.find(editValue => editValue.id === id)
+    setTodo(editValue.todo)
+    setEditId(id)
+  }
 
-### Code Splitting
+```
+</details>
+<br>
+<details>
+<summary>8. এডিট করার সময় সাবমিট এর ফাঙ্কশন এ লজিক ফাঙ্কশন এর মাধ্যমে এডিট সম্পূর্ণ করতে হবে </summary>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```javascript
+    if(editId){
+    const editTodo = todos.find(tod => tod.id === editId);
+    const updateTodos = todos.map(t => t.id === editTodo.id
+      ? (t = { id: t.id, todo }) :
+      { id: t.id, todo: t.todo }
+    )
+      setTodos(updateTodos)
+      setEditId(0)
+      setTodo("")
+      return 
+    }
+```
+</details>
+<br>
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+ 
 
-### Advanced Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
